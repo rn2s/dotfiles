@@ -2,3 +2,5 @@
  - dotfilesの機能 ->  「Brewfileに記載されたソフトウェアの一括インストール」「configsに保存された設定の利用」
  - そのために必要なこと -> 「Brewfileへのソフトウェア情報の追加」「configへの設定の保存」
  - スクリプトで自動化してあること -> 「Brewfileに記載されたソフトウェアの一括インストール」「configに保存された設定にリンクを貼る」
+
+- stowとhomebrewに依存。install.shを行う前にhomebrewのインストールが必要 set-linkを行うまえにGNU-stowのインストールが必要。
