@@ -2,7 +2,7 @@
 set -euo pipefail
 
 # Move to the dotfiles directory.
-cd "$(dirname "$0")"
+cd "$(dirname "$0")/.."
 
 # Install software listed in Brewfile.
 if ! command -v brew >/dev/null 2>&1; then
@@ -10,7 +10,7 @@ if ! command -v brew >/dev/null 2>&1; then
   exit 1
 fi
 
-brew bundle --file Brewfile
+brew bundle --file Brewfile --verbose
 
 # Install Oh My Zsh if missing.
 if [ ! -d "$HOME/.oh-my-zsh" ]; then
