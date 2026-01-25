@@ -582,7 +582,30 @@ before packages are loaded."
     (when (bound-and-true-p current-input-method)
       (deactivate-input-method)))
   (add-hook 'evil-insert-state-exit-hook #'my/evil-disable-input-method)
+  (defvar my/vterm-reuse-buffer-name "*vterm*"
+    "Reusable vterm buffer name for quick access.")
+  (defun my/vterm-reuse ()
+    "Switch to the reusable vterm buffer, creating it if needed."
+    (interactive)
+    (if (get-buffer my/vterm-reuse-buffer-name)
+        (switch-to-buffer my/vterm-reuse-buffer-name)
+      (let ((vterm-buffer-name my/vterm-reuse-buffer-name))
+        (vterm))))
+  (defun my/multi-vterm-new ()
+    "Open a new vterm buffer, falling back to the source if needed."
+    (interactive)
+    (require 'multi-vterm nil t)
+    (unless (fboundp 'multi-vterm)
+      (let ((lib (locate-library "multi-vterm")))
+        (when lib
+          (load (concat (file-name-sans-extension lib) ".el") nil t))))
+    (if (fboundp 'multi-vterm)
+        (call-interactively 'multi-vterm)
+      (user-error "multi-vterm is not available")))
+  (spacemacs/declare-prefix "ot" "vterm")
   (spacemacs/set-leader-keys
+    "ota" 'my/vterm-reuse
+    "otn" 'my/multi-vterm-new
     "oc" 'org-capture
     "oa" 'org-agenda
     "ol" 'org-store-link)
