@@ -5,7 +5,10 @@
 ## Prerequisites
 - Homebrew（`scripts/install.sh` 実行前に必要）
 - GNU Stow（`scripts/set-link.sh` 実行前に必要）
-- zsh / docker / docker-compose は別途インストール前提
+- emacs/ zsh / docker / docker-compose は別途インストール前提
+  - windows版でemacsを入れる方法：
+    - wslで `sudo apt update && sudo apt install emacs-gtk`を実行
+    - 基本的にGUI版を想定している
 
 ## Setup
 - Brewfileに記載されたソフトウェアの一括インストール => `make install`
