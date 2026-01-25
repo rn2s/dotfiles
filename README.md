@@ -1,22 +1,21 @@
 ## Overview
-- Brewfileに記載されたソフトウェアの一括インストール -> `make install`
-- configsに保存された設定へのリンク作成 `make set-link`
-- 上記2つをいっぺんに -> `make setup`
+- spacemacsを中心とした開発環境の設定ファイル群
+- Debian, macでは動作確認済み
+
 ## Prerequisites
 - Homebrew（`scripts/install.sh` 実行前に必要）
 - GNU Stow（`scripts/set-link.sh` 実行前に必要）
 - zsh / docker / docker-compose は別途インストール前提
 
 ## Setup
-```sh
-make install
-make set-link
-make setup
-```
+- Brewfileに記載されたソフトウェアの一括インストール => `make install`
+- configsに保存された設定ファイルへのリンク生成 => `make set-link`
+- 上記2つをいっぺんに -> `make setup`
 
 ## Add or Update
 - 新しいソフトを管理したい場合は `Brewfile` に追加
 - 新しい設定は `configs/` に保存
+- リモートの設定変更を反映する際は基本的に`make setup`で問題ないはず
 
 ## Structure
 - `Brewfile`: brew管理したいソフトウェアの一覧
