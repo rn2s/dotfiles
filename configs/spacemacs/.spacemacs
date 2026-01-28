@@ -69,7 +69,10 @@ This function should only modify configuration layer settings."
    ;; `dotspacemacs/user-config'. To use a local version of a package, use the
    ;; `:location' property: '(your-package :location "~/path/to/your-package/")
    ;; Also include the dependencies as they will not be resolved automatically.
-   dotspacemacs-additional-packages '(kanagawa-themes)
+   dotspacemacs-additional-packages '(kanagawa-themes
+                                      mixed-pitch
+                                      org-appear
+                                      org-modern)
 
    ;; A list of packages that cannot be updated.
    dotspacemacs-frozen-packages '()
@@ -572,27 +575,9 @@ It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
   )
 (defun dotspacemacs/user-config ()
-  "Configuration for user code:
-This function is called at the very end of Spacemacs startup, after layer
-configuration.
-Put your configuration code here, except for variables that should be set
-before packages are loaded."
-  (defun my/evil-disable-input-method ()
-    "Disable IME when leaving insert state."
-    (when (bound-and-true-p current-input-method)
-      (deactivate-input-method)))
-  (add-hook 'evil-insert-state-exit-hook #'my/evil-disable-input-method)
-  (defvar my/vterm-reuse-buffer-name "*vterm*"
-    "Reusable vterm buffer name for quick access.")
-  (defun my/vterm-reuse ()
-    "Switch to the reusable vterm buffer, creating it if needed."
-    (interactive)
-    (if (get-buffer my/vterm-reuse-buffer-name)
-        (switch-to-buffer my/vterm-reuse-buffer-name)
-      (let ((vterm-buffer-name my/vterm-reuse-buffer-name))
-        (vterm))))
+
+  "Open a new vterm buffer, falling back to the source if needed."
   (defun my/multi-vterm-new ()
-    "Open a new vterm buffer, falling back to the source if needed."
     (interactive)
     (require 'multi-vterm nil t)
     (unless (fboundp 'multi-vterm)
@@ -604,7 +589,7 @@ before packages are loaded."
       (user-error "multi-vterm is not available")))
   (spacemacs/declare-prefix "ot" "vterm")
   (spacemacs/set-leader-keys
-    "ota" 'my/vterm-reuse
+    "ota" 'vterm
     "otn" 'my/multi-vterm-new
     "oc" 'org-capture
     "oa" 'org-agenda
@@ -632,7 +617,51 @@ before packages are loaded."
     (setq org-refile-targets
           '(("~/org/gtd.org" :maxlevel . 2)
             ("~/org/research.org" :maxlevel . 2)
-            ("~/org/someday.org" :maxlevel . 2))))
+            ("~/org/someday.org" :maxlevel . 2)))
+
+    (setq org-hide-emphasis-markers t
+          org-ellipsis " ▾")
+
+    ;; 表示系モード
+    (add-hook 'org-mode-hook #'org-indent-mode)
+    (add-hook 'org-mode-hook #'visual-line-mode)
+
+    ;; 行幅を整える
+    (setq visual-fill-column-width 88
+          visual-fill-column-center-text t)
+    (add-hook 'org-mode-hook #'visual-fill-column-mode)
+
+    ;; 文章は可変幅に（コードは固定幅）
+    (add-hook 'org-mode-hook #'variable-pitch-mode)
+    (setq org-hide-emphasis-markers t
+          org-ellipsis " ▾")
+
+    ;; 表示系モード
+    (add-hook 'org-mode-hook #'org-indent-mode)
+    (add-hook 'org-mode-hook #'visual-line-mode)
+
+    ;; 行幅を整える
+    (setq visual-fill-column-width 88
+          visual-fill-column-center-text t)
+    (add-hook 'org-mode-hook #'visual-fill-column-mode)
+
+    ;; 文章は可変幅に（コードは固定幅）
+    (add-hook 'org-mode-hook #'variable-pitch-mode)
+    (add-hook 'org-mode-hook #'mixed-pitch-mode)
+    (add-hook 'org-mode-hook #'org-modern-mode)
+    (add-hook 'org-mode-hook #'org-appear-mode))
+
+  (with-eval-after-load 'org-modern
+    (setq org-modern-star '("◉" "○" "●" "◆" "◇" "▶" "▷" "▸")
+          org-modern-hide-stars nil
+          org-modern-table t
+          org-modern-list '((?- . "–") (?* . "•") (?+ . "◦"))))
+  (with-eval-after-load 'org-appear
+    (setq org-appear-autoemphasis t
+          org-appear-autosubmarkers t
+          org-appear-autolinks t
+          org-appear-autoentities t)
+    (setq org-appear-delay 0.1))
   )
 
 ;; Do not write anything past this comment. This i  where Emacs will
@@ -648,10 +677,59 @@ This function is called at the very end of Spacemacs initialization."
    ;; Your init file should contain only one such instance.
    ;; If there is more than one, they won't work right.
    '(custom-safe-themes
-     '("01f347a923dd21661412d4c5a7c7655bf17fb311b57ddbdbd6fce87bd7e58de6" "9af2b1c0728d278281d87dc91ead7f5d9f2287b1ed66ec8941e97ab7a6ab73c0" "d2ab3d4f005a9ad4fb789a8f65606c72f30ce9d281a9e42da55f7f4b9ef5bfc6" "832a3471e6e56c42ae430771a14c65b0006412bb8a0eb94fcc4a604587e20b80" "daa27dcbe26a280a9425ee90dc7458d85bd540482b93e9fa94d4f43327128077" "c20728f5c0cb50972b50c929b004a7496d3f2e2ded387bf870f89da25793bb44" default))
+     '("01f347a923dd21661412d4c5a7c7655bf17fb311b57ddbdbd6fce87bd7e58de6"
+       "9af2b1c0728d278281d87dc91ead7f5d9f2287b1ed66ec8941e97ab7a6ab73c0"
+       "d2ab3d4f005a9ad4fb789a8f65606c72f30ce9d281a9e42da55f7f4b9ef5bfc6"
+       "832a3471e6e56c42ae430771a14c65b0006412bb8a0eb94fcc4a604587e20b80"
+       "daa27dcbe26a280a9425ee90dc7458d85bd540482b93e9fa94d4f43327128077"
+       "c20728f5c0cb50972b50c929b004a7496d3f2e2ded387bf870f89da25793bb44" default))
    '(org-agenda-files '("~/Documents/dump/20260121.org"))
    '(package-selected-packages
-     '(dactyl-mode vimrc-mode code-review emojify a eat esh-help eshell-prompt-extras eshell-z evil-org git-link git-messenger git-modes git-timemachine gitignore-templates gnuplot helm-ls-git helm-org-rifle js2-refactor yasnippet json-mode json-navigator json-reformat json-snatcher multi-term multi-vterm xref org-cliplink org-contrib org-download org-mime org-pomodoro alert log4e gntp org-present org-projectile org-project-capture org-category-capture orgit ghub closql emacsql treepy shell-pop smeargle terminal-here treemacs-magit with-editor magit-section llama orgit-forge yaml-mode kanagawa-themes blacken code-cells company-anaconda anaconda-mode cython-mode dap-mode lsp-docker lsp-treemacs bui helm-cscope helm-pydoc importmagic epc ctable concurrent deferred live-py-mode lsp-pyright nose pet pip-requirements pipenv load-env-vars pippel poetry py-isort pydoc pyenv-mode pythonic pylookup python-pytest pyvenv ruff-format reformatter sphinx-doc uv xcscope yapfify magit add-node-modules-path yaml lsp-mode flycheck ggtags impatient-mode htmlize import-js grizzl js-doc multiple-cursors livid-mode nodejs-repl npm-mode prettier-js skewer-mode js2-mode simple-httpd tern web-beautify org-rich-yank vterm-toggle vterm company-emoji company edit-indirect emoji-cheat-sheet-plus gh-md markdown-toc markdown-mode valign vmd-mode ace-link all-the-icons auto-compile auto-highlight-symbol centered-cursor-mode clean-aindent-mode column-enforce-mode define-word dired-quick-sort disable-mouse drag-stuff dumb-jump elisp-def elisp-demos elisp-slime-nav emr clang-format list-utils eval-sexp-fu evil-cleverparens paredit evil-lion evil-mc evil-textobj-line evil-tutor eyebrowse fancy-battery google-translate helm-comint helm-descbinds helm-make helm-mode-manager helm-org helm-projectile helm-purpose helm-xref highlight-indentation highlight-numbers parent-mode hl-todo hungry-delete indent-guide link-hint multi-line shut-up open-junk-file overseer pkg-info epl paradox spinner password-generator popwin quickrun restart-emacs spaceline powerline string-edit-at-point string-inflection symon treemacs-icons-dired treemacs-persp persp-mode treemacs-projectile treemacs cfrs ht pfuture uuidgen vi-tilde-fringe volatile-highlights window-purpose imenu-list winum writeroom-mode visual-fill-column dotenv-mode ws-butler which-key wgrep vundo undo-fu-session transient toc-org term-cursor symbol-overlay spacemacs-whitespace-cleanup spacemacs-purpose-popwin space-doc rainbow-delimiters projectile posframe popup pcre2el page-break-lines org-superstar nameless macrostep lorem-ipsum inspector info+ hydra hybrid-mode holy-mode highlight-parentheses hide-comnt helm-swoop helm-ag golden-ratio expand-region evil-visualstar evil-visual-mark-mode evil-unimpaired evil-surround evil-numbers evil-nerd-commenter evil-matchit evil-lisp-state evil-indent-plus evil-iedit-state evil-goggles evil-exchange evil-evilified-state evil-escape evil-args evil-anzu editorconfig diminish devdocs avy-jump-helm-line aggressive-indent ace-window)))
+     '(a ace-link ace-window add-node-modules-path aggressive-indent alert
+         all-the-icons anaconda-mode auto-compile auto-highlight-symbol
+         avy-jump-helm-line blacken bui centered-cursor-mode cfrs clang-format
+         clean-aindent-mode closql code-cells code-review column-enforce-mode
+         company company-anaconda company-emoji concurrent ctable cython-mode
+         dactyl-mode dap-mode deferred define-word devdocs diminish
+         dired-quick-sort disable-mouse dotenv-mode drag-stuff dumb-jump eat
+         edit-indirect editorconfig elisp-def elisp-demos elisp-slime-nav emacsql
+         emoji-cheat-sheet-plus emojify emr epc epl esh-help eshell-prompt-extras
+         eshell-z eval-sexp-fu evil-anzu evil-args evil-cleverparens evil-escape
+         evil-evilified-state evil-exchange evil-goggles evil-iedit-state
+         evil-indent-plus evil-lion evil-lisp-state evil-matchit evil-mc
+         evil-nerd-commenter evil-numbers evil-org evil-surround evil-textobj-line
+         evil-tutor evil-unimpaired evil-visual-mark-mode evil-visualstar
+         expand-region eyebrowse fancy-battery flycheck ggtags gh-md ghub git-link
+         git-messenger git-modes git-timemachine gitignore-templates gntp gnuplot
+         golden-ratio google-translate grizzl helm-ag helm-comint helm-cscope
+         helm-descbinds helm-ls-git helm-make helm-mode-manager helm-org
+         helm-org-rifle helm-projectile helm-purpose helm-pydoc helm-swoop
+         helm-xref hide-comnt highlight-indentation highlight-numbers
+         highlight-parentheses hl-todo holy-mode ht htmlize hungry-delete
+         hybrid-mode hydra imenu-list impatient-mode import-js importmagic
+         indent-guide info+ inspector js-doc js2-mode js2-refactor json-mode
+         json-navigator json-reformat json-snatcher kanagawa-themes link-hint
+         list-utils live-py-mode livid-mode llama load-env-vars log4e lorem-ipsum
+         lsp-docker lsp-mode lsp-pyright lsp-treemacs macrostep magit
+         magit-section markdown-mode markdown-toc mixed-pitch multi-line
+         multi-term multi-vterm multiple-cursors nameless nodejs-repl nose
+         npm-mode open-junk-file org-appear org-category-capture org-cliplink
+         org-contrib org-download org-mime org-modern org-pomodoro org-present
+         org-project-capture org-projectile org-rich-yank org-superstar orgit
+         orgit-forge overseer page-break-lines paradox paredit parent-mode
+         password-generator pcre2el persp-mode pet pfuture pip-requirements pipenv
+         pippel pkg-info poetry popup popwin posframe powerline prettier-js
+         projectile py-isort pydoc pyenv-mode pylookup python-pytest pythonic
+         pyvenv quickrun rainbow-delimiters reformatter restart-emacs ruff-format
+         shell-pop shut-up simple-httpd skewer-mode smeargle space-doc spaceline
+         spacemacs-purpose-popwin spacemacs-whitespace-cleanup sphinx-doc spinner
+         sqlite3 string-edit-at-point string-inflection symbol-overlay symon
+         term-cursor terminal-here tern toc-org transient treemacs
+         treemacs-icons-dired treemacs-magit treemacs-persp treemacs-projectile
+         treepy undo-fu-session uuidgen uv valign vi-tilde-fringe vimrc-mode
+         visual-fill-column vmd-mode volatile-highlights vterm vterm-toggle vundo
+         web-beautify wgrep which-key window-purpose winum with-editor
+         writeroom-mode ws-butler xcscope xref yaml yaml-mode yapfify yasnippet)))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.
