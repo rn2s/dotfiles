@@ -1,4 +1,4 @@
-#!/bin/bash
+#!/usr/bin/env zsh
 # スクリプトがある場所（dotfiles）に移動
 cd "$(dirname "$0")/.."
 

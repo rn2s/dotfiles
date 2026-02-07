@@ -1,9 +1,14 @@
 [user]
-	name = rn2s
-	email = bp21071@shibaura-it.ac.jp
+	name = shujimurase
+	email = shuji.murase@techouse.jp
+	signingkey = /Users/shujimurase/.ssh/id_ed25519.bastion
 [credential "https://github.com"]
 	helper = 
 	helper = !/opt/homebrew/bin/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper = 
 	helper = !/opt/homebrew/bin/gh auth git-credential
+[gpg]
+	format = ssh
+[commit]
+	gpgsign = true
