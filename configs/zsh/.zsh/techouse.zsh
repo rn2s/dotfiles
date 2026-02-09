@@ -47,6 +47,8 @@ path=(
 	  /opt/homebrew/bin(N-/)
 	  $path
 )
+# Ruby ビルド用のコンパイラ指定（macOS）
+export CC=/usr/bin/clang
 
 # プロンプトの設定
 PROMPT="%K{red}%F{black}%n ($(arch)):%~"$'\n'"%# %f%k"
