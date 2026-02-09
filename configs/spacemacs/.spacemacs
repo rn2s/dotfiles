@@ -32,7 +32,9 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '((ruby :variables ruby-backend 'lsp)
+   '((ruby :variables
+           ruby-backend 'lsp
+           ruby-lsp-server 'solargraph)
      vimscript
      latex
      pdf
@@ -578,6 +580,11 @@ It is mostly for variables that should be set before packages are loaded.
 If you are unsure, try setting them in `dotspacemacs/user-config' first."
   )
 (defun dotspacemacs/user-config ()
+
+  ;; rbenv系コマンド実行のためshimsパスをemacsに伝達
+  (let ((path "/Users/shujimurase/.rbenv/shims"))
+    (setenv "PATH" (concat path ":" (getenv "PATH")))
+    (add-to-list 'exec-path path))
 
   ;; Projectile除外設定
   (with-eval-after-load 'projectile

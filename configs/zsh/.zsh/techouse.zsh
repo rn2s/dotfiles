@@ -41,6 +41,17 @@ alias chdc='tmux kill-session -t chw 2>/dev/null ; tmux kill-session -t chc 2>/d
 # その他
 alias keen="cd ~/workspace/KeenDemo && docker compose up -d && cd ~/workspace/CHWorkforce"
 
+# homebrew
+typeset -U path PATH
+path=(
+	  /opt/homebrew/bin(N-/)
+	  $path
+)
+
+# プロンプトの設定
+PROMPT="%K{red}%F{black}%n ($(arch)):%~"$'\n'"%# %f%k"
+
+
 # ========================================
 # 機密情報は ~/.secrets.env に移動してください
 # ========================================
