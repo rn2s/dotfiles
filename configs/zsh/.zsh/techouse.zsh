@@ -47,3 +47,4 @@ alias keen="cd ~/workspace/KeenDemo && docker compose up -d && cd ~/workspace/CH
 # 以下のような内容を ~/.secrets.env に記載：
 # export BUNDLE_GITHUB__COM=github_pat_..
 export PATH=$HOME/.nodebrew/current/bin:$PATH
+
