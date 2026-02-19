@@ -1,7 +1,7 @@
 [user]
 	name = shujimurase
 	email = shuji.murase@techouse.jp
-	signingkey = /Users/shujimurase/.ssh/id_ed25519.bastion
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEV8oI7hSONvKxaKhx5TCPbq1sqc8WLN85Bdga4e9VAm
 [credential "https://github.com"]
 	helper = 
 	helper = !/opt/homebrew/bin/gh auth git-credential

@@ -31,6 +31,9 @@ alias chw='cd "$CHW_DIR"'
 
 # SSH
 alias sshneptune='autossh -M 0 chw-int-neptune'
+alias sshchwdb='ssh ssh10.th-svc.net'
+alias sshchcidb='cd "$CHC_DIR" && AWS_PROFILE=central-int STAGE=int ./script/tunnel_rds.sh'
+alias sshchcsdb='cd "$CHC_DIR" && AWS_PROFILE=central-stg STAGE=stg ./script/tunnel_rds.sh'
 
 # プロジェクト起動・停止
 alias chuw='tmux kill-session -t chw 2>/dev/null ; echo "$CHW_DIR" ; cd "$CHW_DIR" && make up-all && tmuxinator chw'

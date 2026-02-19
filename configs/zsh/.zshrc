@@ -37,3 +37,8 @@ if [ -d "$HOME/dotfiles-th/.zsh" ]; then
   done
 fi
 
+# ========================================
+# Bitwarden SSH Agent
+# ========================================
+export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
+
