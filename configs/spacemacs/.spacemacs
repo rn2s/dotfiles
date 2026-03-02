@@ -586,6 +586,12 @@ If you are unsure, try setting them in `dotspacemacs/user-config' first."
     (setenv "PATH" (concat path ":" (getenv "PATH")))
     (add-to-list 'exec-path path))
 
+  ;; insert stateで "jj" を押すとESCに戻る
+  (with-eval-after-load 'evil-escape
+    (setq-default evil-escape-key-sequence "jj"
+                  evil-escape-delay 0.2)
+    (evil-escape-mode 1))
+
   ;; Projectile除外設定
   (with-eval-after-load 'projectile
     (add-to-list 'projectile-globally-ignored-directories "log")
