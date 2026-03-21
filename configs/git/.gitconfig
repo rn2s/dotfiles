@@ -1,7 +1,3 @@
-# dotfilesディレクトリのみ個人用鍵を使用
-[includeIf "gitdir:~/dotfiles/"]
-	path = ~/.gitconfig-personal
-
 # デフォルト設定（会社用）
 [core]
 	sshCommand = ssh -i ~/.ssh/id_ed25519_techouse -o IdentitiesOnly=yes -F /dev/null
@@ -11,12 +7,16 @@
 	email = shuji.murase@techouse.jp
 	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSHPSAxwY4RgoyKDtXyBtWZ13/ZlV6atiAyy+SAQikH
 [credential "https://github.com"]
-	helper = 
+	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
 [credential "https://gist.github.com"]
-	helper = 
+	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
 [gpg]
 	format = ssh
 [commit]
 	gpgsign = true
+
+# dotfilesディレクトリのみ個人用鍵を使用（必ず末尾に置く）
+[includeIf "gitdir:~/dotfiles/"]
+	path = ~/.gitconfig-personal
