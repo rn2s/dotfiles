@@ -38,7 +38,8 @@ if [ -d "$HOME/dotfiles-th/.zsh" ]; then
 fi
 
 # ========================================
-# Bitwarden SSH Agent
+# iTerm2起動時に自動でtmuxセッションへ
 # ========================================
-export SSH_AUTH_SOCK="$HOME/.bitwarden-ssh-agent.sock"
-
+if [ -z "$TMUX" ] && [ "$TERM_PROGRAM" = "iTerm.app" ]; then
+  exec tmux new-session -A -s main
+fi

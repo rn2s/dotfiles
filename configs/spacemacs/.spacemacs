@@ -32,7 +32,8 @@ This function should only modify configuration layer settings."
 
    ;; List of configuration layers to load.
    dotspacemacs-configuration-layers
-   '((ruby :variables
+   '(sql
+     (ruby :variables
            ruby-backend 'lsp
            ruby-lsp-server 'solargraph)
      vimscript
@@ -747,14 +748,14 @@ This function is called at the very end of Spacemacs initialization."
          ruby-refactor ruby-test-mode ruby-tools ruff-format rvm shell-pop shut-up
          simple-httpd skewer-mode smeargle space-doc spaceline
          spacemacs-purpose-popwin spacemacs-whitespace-cleanup sphinx-doc spinner
-         sqlite3 string-edit-at-point string-inflection symbol-overlay symon
-         term-cursor terminal-here tern toc-org transient treemacs
-         treemacs-icons-dired treemacs-magit treemacs-persp treemacs-projectile
-         treepy undo-fu-session uuidgen uv valign vi-tilde-fringe vimrc-mode
-         visual-fill-column vmd-mode volatile-highlights vterm vterm-toggle vundo
-         web-beautify wgrep which-key window-purpose winum with-editor
-         writeroom-mode ws-butler xcscope xref yaml yaml-mode yapfify yasnippet
-         yasnippet-snippets)))
+         sql-indent sqlite3 sqlup-mode string-edit-at-point string-inflection
+         symbol-overlay symon term-cursor terminal-here tern toc-org transient
+         treemacs treemacs-icons-dired treemacs-magit treemacs-persp
+         treemacs-projectile treepy undo-fu-session uuidgen uv valign
+         vi-tilde-fringe vimrc-mode visual-fill-column vmd-mode
+         volatile-highlights vterm vterm-toggle vundo web-beautify wgrep which-key
+         window-purpose winum with-editor writeroom-mode ws-butler xcscope xref
+         yaml yaml-mode yapfify yasnippet yasnippet-snippets)))
   (custom-set-faces
    ;; custom-set-faces was added by Custom.
    ;; If you edit it by hand, you could mess it up, so be careful.

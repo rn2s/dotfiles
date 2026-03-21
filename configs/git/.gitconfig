@@ -1,7 +1,15 @@
+# dotfilesディレクトリのみ個人用鍵を使用
+[includeIf "gitdir:~/dotfiles/"]
+	path = ~/.gitconfig-personal
+
+# デフォルト設定（会社用）
+[core]
+	sshCommand = ssh -i ~/.ssh/id_ed25519_techouse -o IdentitiesOnly=yes -F /dev/null
+
 [user]
 	name = shujimurase
 	email = shuji.murase@techouse.jp
-	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEV8oI7hSONvKxaKhx5TCPbq1sqc8WLN85Bdga4e9VAm
+	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSHPSAxwY4RgoyKDtXyBtWZ13/ZlV6atiAyy+SAQikH
 [credential "https://github.com"]
 	helper = 
 	helper = !/opt/homebrew/bin/gh auth git-credential
