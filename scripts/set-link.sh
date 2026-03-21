@@ -1,4 +1,6 @@
 #!/usr/bin/env zsh
+setopt null_glob
+
 # スクリプトがある場所（dotfiles）に移動
 cd "$(dirname "$0")/.."
 
@@ -17,6 +19,21 @@ for name in "${config_dirs[@]}"; do
   while IFS= read -r relpath; do
     target="$HOME/$relpath"
     expected="$PWD/configs/$name/$relpath"
+    has_symlink_parent=0
+
+    parent="$target"
+    while [ "$parent" != "$HOME" ] && [ "$parent" != "/" ]; do
+      parent="$(dirname "$parent")"
+      if [ -L "$parent" ]; then
+        symlink_parents+=("$parent")
+        has_symlink_parent=1
+        break
+      fi
+    done
+
+    if [ "$has_symlink_parent" -eq 1 ]; then
+      continue
+    fi
 
     if [ -L "$target" ]; then
       if [ "$(readlink -f "$target")" = "$expected" ]; then
@@ -26,22 +43,11 @@ for name in "${config_dirs[@]}"; do
       continue
     fi
 
-    parent="$target"
-    while [ "$parent" != "$HOME" ] && [ "$parent" != "/" ]; do
-      parent="$(dirname "$parent")"
-      if [ -L "$parent" ]; then
-        symlink_parents+=("$parent")
-        parent="$HOME"
-      fi
-    done
-
-    if [ "${#symlink_parents[@]}" -eq 0 ]; then
-      conflicts+=("$target")
-    fi
+    conflicts+=("$target")
   done < <(find "configs/$name" \( -type f -o -type l \) | sed "s|^configs/$name/||")
 
   if [ "${#symlink_parents[@]}" -gt 0 ]; then
-    mapfile -t uniq_symlink_parents < <(printf '%s\n' "${symlink_parents[@]}" | sort -u)
+    uniq_symlink_parents=("${(@u)symlink_parents}")
     printf 'symlinked parent directories detected for %s:\n' "$name"
     printf '  %s\n' "${uniq_symlink_parents[@]}"
     printf 'replace these symlinked directories? [y/N]: '
@@ -56,7 +62,7 @@ for name in "${config_dirs[@]}"; do
   fi
 
   if [ "${#conflicts[@]}" -gt 0 ]; then
-    mapfile -t uniq_conflicts < <(printf '%s\n' "${conflicts[@]}" | sort -u)
+    uniq_conflicts=("${(@u)conflicts}")
     printf 'remove existing files for %s:\n' "$name"
     printf '  %s\n' "${uniq_conflicts[@]}"
     for target in "${uniq_conflicts[@]}"; do
