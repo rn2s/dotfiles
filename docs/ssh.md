@@ -4,63 +4,64 @@
 
 | ファイル | 用途 | 対応アカウント |
 |---------|------|--------------|
-| `~/.ssh/id_ed25519_techouse` | 会社用（デフォルト） | shuji.murase@techouse.jp |
-| `~/.ssh/id_ed25519_sit` | 個人用 | bp21071@shibaura-it.ac.jp |
+| `~/.ssh/id_ed25519_sit` | 個人用（デフォルト） | bp21071@shibaura-it.ac.jp |
+| `~/.ssh/id_ed25519_techouse` | 会社用（`techouse-inc` リポジトリのみ） | shuji.murase@techouse.jp |
 
 ## Gitの設定
 
 ### 基本方針
 
-- **デフォルトは会社用**：`~/.gitconfig` に会社用設定を記載
-- **`~/dotfiles/` 内のみ個人用**：`~/.gitconfig-personal` で上書き（`[includeIf]` を末尾に置くことで正しく上書きが効く）
+- **デフォルトは個人用**：`~/.gitconfig` に SIT 用設定を記載
+- **`techouse-inc` のリポジトリのみ会社用**：remote URL に `techouse-inc` が含まれるリポジトリだけ `~/.gitconfig-techouse` を読み込む
+- 条件付き include は `includeIf.hasconfig:remote.*.url` を使う。判定対象は `origin` に限らず、そのリポジトリに設定されている全 remote URL。
 
 ### `~/.gitconfig`（dotfiles管理）
 
 ```gitconfig
-# デフォルト設定（会社用）
-[core]
-    sshCommand = ssh -i ~/.ssh/id_ed25519_techouse -o IdentitiesOnly=yes -F /dev/null
-
-[user]
-    name = shujimurase
-    email = shuji.murase@techouse.jp
-    signingkey = ssh-ed25519 <id_ed25519_techouseの公開鍵>
-
-[gpg]
-    format = ssh
-[commit]
-    gpgsign = true
-
-# dotfilesディレクトリのみ個人用鍵を使用（必ず末尾に置く）
-[includeIf "gitdir:~/dotfiles/"]
-    path = ~/.gitconfig-personal
-```
-
-### `~/.gitconfig-personal`（dotfiles管理外・手動配置）
-
-```gitconfig
+# デフォルト設定（個人用）
 [core]
     sshCommand = ssh -i ~/.ssh/id_ed25519_sit -o IdentitiesOnly=yes -F /dev/null
 
 [user]
     name = shujimurase
     email = bp21071@shibaura-it.ac.jp
-    signingkey = ssh-ed25519 <id_ed25519_sitの公開鍵>
+    signingkey = ~/.ssh/id_ed25519_sit.pub
+
+[gpg]
+    format = ssh
+[commit]
+    gpgsign = true
+
+# techouse-inc のリポジトリのみ会社用設定を使用（必ず末尾に置く）
+[includeIf "hasconfig:remote.*.url:git@github.com:techouse-inc/**"]
+    path = ~/.gitconfig-techouse
+[includeIf "hasconfig:remote.*.url:ssh://git@github.com/techouse-inc/**"]
+    path = ~/.gitconfig-techouse
+[includeIf "hasconfig:remote.*.url:https://github.com/techouse-inc/**"]
+    path = ~/.gitconfig-techouse
 ```
 
-このファイルはdotfilesリポジトリに含めず、各マシンに手動で配置する。
+### `~/.gitconfig-techouse`（dotfiles管理）
 
-## SSH Agentの設定
+```gitconfig
+[core]
+    sshCommand = ssh -i ~/.ssh/id_ed25519_techouse -o IdentitiesOnly=yes -F /dev/null
 
-macOS Keychainを使用する。`~/.ssh/config` に以下を設定済み：
-
+[user]
+    name = shujimurase
+    email = shuji.murase@techouse.jp
+    signingkey = ~/.ssh/id_ed25519_techouse.pub
 ```
-Host *
-    AddKeysToAgent yes
-    UseKeychain yes
-```
 
-**Bitwarden SSH Agentは使用しない**（過去に試みたが廃止）。
+このファイルは `configs/git/.gitconfig-techouse` として dotfiles で管理し、`scripts/set-link.sh` で `~/.gitconfig-techouse` にリンクする。
+
+## SSH / SSH Agent の考え方
+
+- Git の鍵選択は `core.sshCommand` で明示する。`-F /dev/null` を付けているため、Git 実行時は `~/.ssh/config` の Host 設定を読まない。
+- SSH agent は「秘密鍵のパスフレーズ入力を省略する」「SSH 署名鍵を使う」ために使う。鍵選択そのものは `core.sshCommand` 側で決める。
+- Bitwarden SSH Agent は使わない。
+
+`~/.ssh/config` で `github.com` を `ssh.github.com:443` に逃がす設定を使いたい場合は、`core.sshCommand` の `-F /dev/null` を外すか、`sshCommand` 側に HostName/Port を明示する。
 
 ## 新しいマシンのセットアップ手順
 
@@ -72,50 +73,55 @@ chmod 600 ~/.ssh/id_ed25519_techouse
 chmod 600 ~/.ssh/id_ed25519_sit
 ```
 
-### 2. SSH AgentへKeychainに鍵を登録
+### 2. dotfiles の Git 設定をリンク
 
 ```zsh
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519_techouse
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519_sit
+cd ~/dotfiles
+./scripts/set-link.sh
+```
+
+`~/.gitconfig` と `~/.gitconfig-techouse` が作られることを確認する。
+
+### 3. 必要なら SSH Agent に鍵を登録
+
+```zsh
+ssh-add ~/.ssh/id_ed25519_sit
+ssh-add ~/.ssh/id_ed25519_techouse
 
 # 登録確認
 ssh-add -l
 ```
 
-以後は再起動後も Keychain から自動ロードされる。
-
-### 3. `~/.gitconfig-personal` の手動作成
-
-```zsh
-cat > ~/.gitconfig-personal << 'EOF'
-[core]
-    sshCommand = ssh -i ~/.ssh/id_ed25519_sit -o IdentitiesOnly=yes -F /dev/null
-
-[user]
-    name = shujimurase
-    email = bp21071@shibaura-it.ac.jp
-    signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIEV8oI7hSONvKxaKhx5TCPbq1sqc8WLN85Bdga4e9VAm
-EOF
-```
+macOS で Keychain を使うなら `ssh-add --apple-use-keychain ...` を使う。Linux では通常の `ssh-add` でよい。
 
 ### 4. 動作確認
 
 ```zsh
-# 会社GitHubへの接続確認
-ssh -T git@github.com
-
-# dotfilesディレクトリ内で個人設定が使われているか確認
+# 通常リポジトリでは SIT 設定
 cd ~/dotfiles
-git config user.email   # => bp21071@shibaura-it.ac.jp になること
+git config user.email   # => bp21071@shibaura-it.ac.jp
+git config core.sshCommand
 
-# 会社リポジトリで会社設定が使われているか確認
-cd ~/work/some-company-repo
-git config user.email   # => shuji.murase@techouse.jp になること
+# techouse-inc リポジトリでは techouse 設定
+cd ~/work/CHCentral
+git remote -v           # techouse-inc/CHCentral を指していること
+git config user.email   # => shuji.murase@techouse.jp
+git config core.sshCommand
+```
+
+認証そのものを確認したい場合は、`GIT_SSH_COMMAND` で対象鍵を明示して確認する。
+
+```zsh
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519_sit -o IdentitiesOnly=yes -F /dev/null' \
+  git ls-remote git@github.com:rn2s/dotfiles.git >/dev/null
+
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519_techouse -o IdentitiesOnly=yes -F /dev/null' \
+  git ls-remote git@github.com:techouse-inc/CHCentral.git >/dev/null
 ```
 
 ### 5. GitHubへの署名鍵の登録
 
-コミット署名（`gpgsign = true`）が機能するには、各GitHubアカウントに公開鍵を「Signing key」として登録する必要がある。
+コミット署名（`gpgsign = true`）が機能するには、各 GitHub アカウントに公開鍵を「Signing key」として登録する必要がある。
 
 - 会社GitHubアカウント → `id_ed25519_techouse.pub` を Signing key として登録
 - 個人GitHubアカウント → `id_ed25519_sit.pub` を Signing key として登録
@@ -124,19 +130,34 @@ git config user.email   # => shuji.murase@techouse.jp になること
 
 ### コミット署名が失敗する
 
-SSH agentに鍵が登録されていない可能性が高い。
+SSH agent に鍵が登録されていない可能性が高い。
 
 ```zsh
 ssh-add -l  # "The agent has no identities." が表示されたら未登録
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519_techouse
-ssh-add --apple-use-keychain ~/.ssh/id_ed25519_sit
+ssh-add ~/.ssh/id_ed25519_sit
+ssh-add ~/.ssh/id_ed25519_techouse
 ```
 
-### dotfilesで個人メールが使われない
+### `techouse-inc` リポジトリで会社メールが使われない
 
-`~/.gitconfig-personal` が存在しないか、`~/.gitconfig` の `[includeIf]` が末尾にない。
-`[includeIf]` は**必ず `.gitconfig` の末尾**に記述すること（上書きの順序の問題）。
+remote URL が `techouse-inc` を含む形になっているか確認する。`includeIf.hasconfig:remote.*.url` は remote URL を条件にしているため、remote が未設定のリポジトリでは会社用設定に切り替わらない。
 
-### git pushがPermission deniedになる
+```zsh
+git remote -v
+git config --show-origin --get-all user.email
+git config --show-origin --get-all core.sshCommand
+```
 
-`ssh -T git@github.com` で接続確認。エラーが出る場合、対象アカウントに `id_ed25519_techouse.pub` または `id_ed25519_sit.pub` が Authentication key として登録されているか確認する。
+### git push が Permission denied になる
+
+どの鍵で接続しているかを固定して確認する。
+
+```zsh
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519_sit -o IdentitiesOnly=yes -F /dev/null' \
+  git ls-remote git@github.com:rn2s/dotfiles.git
+
+GIT_SSH_COMMAND='ssh -i ~/.ssh/id_ed25519_techouse -o IdentitiesOnly=yes -F /dev/null' \
+  git ls-remote git@github.com:techouse-inc/CHCentral.git
+```
+
+これが失敗するなら、対象 GitHub アカウントに対応する `*.pub` が Authentication key として登録されているか確認する。

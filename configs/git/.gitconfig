@@ -1,22 +1,28 @@
-# デフォルト設定（会社用）
+# デフォルト設定（個人用）
 [core]
-	sshCommand = ssh -i ~/.ssh/id_ed25519_techouse -o IdentitiesOnly=yes -F /dev/null
+	sshCommand = ssh -i ~/.ssh/id_ed25519_sit -o IdentitiesOnly=yes -F /dev/null
 
 [user]
 	name = shujimurase
-	email = shuji.murase@techouse.jp
-	signingkey = ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIDSHPSAxwY4RgoyKDtXyBtWZ13/ZlV6atiAyy+SAQikH
+	email = bp21071@shibaura-it.ac.jp
+	signingkey = ~/.ssh/id_ed25519_sit.pub
+
 [credential "https://github.com"]
 	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
 [credential "https://gist.github.com"]
 	helper =
 	helper = !/opt/homebrew/bin/gh auth git-credential
+
 [gpg]
 	format = ssh
 [commit]
 	gpgsign = true
 
-# dotfilesディレクトリのみ個人用鍵を使用（必ず末尾に置く）
-[includeIf "gitdir:~/dotfiles/"]
-	path = ~/.gitconfig-personal
+# techouse-inc のリポジトリのみ会社用設定を使用（必ず末尾に置く）
+[includeIf "hasconfig:remote.*.url:git@github.com:techouse-inc/**"]
+	path = ~/.gitconfig-techouse
+[includeIf "hasconfig:remote.*.url:ssh://git@github.com/techouse-inc/**"]
+	path = ~/.gitconfig-techouse
+[includeIf "hasconfig:remote.*.url:https://github.com/techouse-inc/**"]
+	path = ~/.gitconfig-techouse
